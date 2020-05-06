@@ -80,7 +80,8 @@ def create_meta_batch(meta_model, model, inner_batches):
             p.detach().add_(-p.grad * INNER_LR)
         all_targets.append(model.get_parameters())
     targets = torch.stack(all_targets, dim=0)
-    meta_loss = torch.mean(torch.pow(targets[:, None] - sample_seqs, 2))
+    meta_loss = torch.mean(torch.pow(targets[:, None] - parameters, 2))
+    meta_loss *= model.param_size()
     return meta_loss, np.mean(init_losses)
 
 
