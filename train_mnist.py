@@ -40,8 +40,7 @@ def main():
 
 
 def create_meta_batch(meta_model, model, inner_batches):
-    with torch.no_grad():
-        parameters = meta_model.sample(META_BATCH_SIZE)
+    parameters = meta_model.sample(META_BATCH_SIZE)
     init_losses = []
     all_targets = []
     for i in range(META_BATCH_SIZE):
@@ -57,8 +56,7 @@ def create_meta_batch(meta_model, model, inner_batches):
             p.detach().add_(-p.grad * INNER_LR)
         all_targets.append(model.get_parameters())
     targets = torch.stack(all_targets, dim=0)
-    recons = meta_model(targets)
-    meta_loss = torch.mean(torch.pow(targets[:, None] - recons, 2))
+    meta_loss = torch.mean(torch.pow(targets[:, None] - parameters, 2))
     return meta_loss, np.mean(init_losses)
 
 
