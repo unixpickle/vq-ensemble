@@ -14,6 +14,7 @@ INNER_BATCH_SIZE = 128
 META_BATCH_SIZE = 4
 NUM_STAGES = 20
 INNER_LR = 1e-3
+META_LR = 1e-4
 
 
 def main():
@@ -26,7 +27,7 @@ def main():
     model.to(DEVICE)
     meta_model.to(DEVICE)
 
-    opt = optim.Adam(meta_model.parameters())
+    opt = optim.Adam(meta_model.parameters(), lr=META_LR)
     while True:
         train_loss, train_inner_loss = create_meta_batch(meta_model, model, train_batches)
         test_loss, test_inner_loss = create_meta_batch(meta_model, model, test_batches)
