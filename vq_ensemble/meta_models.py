@@ -71,11 +71,12 @@ class Encoder(nn.Module):
 
 
 class Refiner(nn.Module):
-    def __init__(self, param_size, num_stages, num_options=4, hidden_size=512):
+    def __init__(self, param_size, num_stages, num_options=4, hidden_size=512, no_nn=False):
         super().__init__()
         self.param_size = param_size
         self.num_stages = num_stages
         self.num_options = num_options
+        self.no_nn = no_nn
 
         self.stage_embedding = nn.Parameter(torch.randn(num_stages, hidden_size))
         self.biases = nn.Parameter(torch.randn(num_stages, num_options, param_size))
@@ -107,12 +108,15 @@ class Refiner(nn.Module):
         Returns:
             A batch of refinements, [N x K x param_size].
         """
-        embedding = self.stage_embedding[stage]
-        out = self.in_layer(params_in)
-        out = out + embedding
-        out = self.mid_layer(out)
-        out = out + embedding
-        out = self.out_layer(out)
-        out = out.view(params_in.shape[0], self.num_options, self.param_size)
-        out = out + self.biases[stage]
+        if self.no_nn:
+            out = self.biases[stage]
+        else:
+            embedding = self.stage_embedding[stage]
+            out = self.in_layer(params_in)
+            out = out + embedding
+            out = self.mid_layer(out)
+            out = out + embedding
+            out = self.out_layer(out)
+            out = out.view(params_in.shape[0], self.num_options, self.param_size)
+            out = out + self.biases[stage]
         return out * self.output_scales[stage] + params_in[:, None]
