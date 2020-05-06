@@ -79,6 +79,7 @@ class Refiner(nn.Module):
 
         self.stage_embedding = nn.Parameter(torch.randn(num_stages, hidden_size))
         self.biases = nn.Parameter(torch.randn(num_stages, num_options, param_size))
+        self.output_scales = nn.Parameter(0.1 * torch.ones(num_stages))
         self.in_layer = nn.Sequential(
             nn.Linear(param_size, hidden_size),
             nn.ReLU(),
@@ -114,4 +115,4 @@ class Refiner(nn.Module):
         out = self.out_layer(out)
         out = out.view(params_in.shape[0], self.num_options, self.param_size)
         out = out + self.biases[stage]
-        return out
+        return out * self.output_scales[stage] + params_in[:, None]
