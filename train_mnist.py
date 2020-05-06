@@ -53,7 +53,7 @@ def create_meta_batch(meta_model, model, inner_batches):
         model.zero_grad()
         loss.backward()
         for p in model.parameters():
-            p.detach().add(-p.grad * INNER_LR)
+            p.detach().add_(-p.grad * INNER_LR)
         all_targets.append(model.get_parameters())
     targets = torch.stack(all_targets, dim=0)
     recons = meta_model(targets)
