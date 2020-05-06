@@ -42,11 +42,11 @@ def main():
 
         step += 1
         if not step % EVAL_INTERVAL:
-            evaluate(meta_model, model, test_loader)
+            evaluate(meta_model, model, train_loader, 'train')
+            evaluate(meta_model, model, test_loader, 'test')
 
 
-def evaluate(meta_model, model, loader):
-    print('Evaluating model on test set...')
+def evaluate(meta_model, model, loader, dataset):
     weights = meta_model.decode(meta_model.random_latents(1))[0, -1]
     model.set_parameters(weights)
     num_correct = 0
@@ -58,7 +58,7 @@ def evaluate(meta_model, model, loader):
         classes = torch.argmax(outputs, dim=-1)
         num_correct += torch.sum(classes == output_batch).item()
         num_total += input_batch.shape[0]
-    print('Evaluation accuracy: %.2f%%' % (100 * num_correct / num_total))
+    print('Evaluation accuracy (%s): %.2f%%' % (dataset, 100 * num_correct / num_total))
 
 
 def create_meta_batch(meta_model, model, inner_batches):
