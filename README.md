@@ -41,7 +41,8 @@ In this experiment, I added dropout to the baseline. Since dropout creates an im
 To run this experiment, set `DROPOUT = True` in [train_mnist_baseline.py](train_mnist_baseline.py).
 
 ```
-RESULTS HERE
+Evaluation accuracy (train): 99.65%
+Evaluation accuracy (test): 98.85%
 ```
 
 ## vq-ensemble (take 1)
