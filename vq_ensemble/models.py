@@ -55,7 +55,7 @@ class MNISTModel(Model):
     MNISTModel is a convolutional classifier for MNIST.
     """
 
-    def __init__(self):
+    def __init__(self, dropout=False):
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, 32, 3, stride=2, padding=1),
@@ -63,11 +63,20 @@ class MNISTModel(Model):
             nn.Conv2d(32, 32, 3, stride=2, padding=1),
             nn.ReLU(),
         )
-        self.fc = nn.Sequential(
-            nn.Linear(7*7*32, 32),
-            nn.ReLU(),
-            nn.Linear(32, 10),
-        )
+        if dropout:
+            self.fc = nn.Sequential(
+                nn.Dropout(0.25),
+                nn.Linear(7*7*32, 32),
+                nn.ReLU(),
+                nn.Dropout(0.25),
+                nn.Linear(32, 10),
+            )
+        else:
+            self.fc = nn.Sequential(
+                nn.Linear(7*7*32, 32),
+                nn.ReLU(),
+                nn.Linear(32, 10),
+            )
 
     def forward(self, x):
         return self.fc(self.conv(x).view(x.shape[0], -1))

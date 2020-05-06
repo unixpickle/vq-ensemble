@@ -8,6 +8,9 @@ from train_mnist import DEVICE, load_batches, create_datasets
 
 EVAL_INTERVAL = 2000
 REDUCE_LR_STEPS = 500
+TOTAL_STEPS = 42000
+
+DROPOUT = False
 
 
 def main():
@@ -15,7 +18,7 @@ def main():
     train_batches = load_batches(train_loader)
     test_batches = load_batches(test_loader)
 
-    model = MNISTModel()
+    model = MNISTModel(dropout=DROPOUT)
     model.to(DEVICE)
 
     opt = optim.Adam(model.parameters(), lr=1e-3)
@@ -37,6 +40,8 @@ def main():
         if not step % EVAL_INTERVAL:
             evaluate(model, train_loader, 'train')
             evaluate(model, test_loader, 'test')
+        if step == TOTAL_STEPS:
+            break
 
 
 def model_loss(model, batches):
@@ -46,6 +51,7 @@ def model_loss(model, batches):
 
 
 def evaluate(model, loader, dataset):
+    model.eval()
     num_correct = 0
     num_total = 0
     for input_batch, output_batch in loader:
@@ -56,6 +62,7 @@ def evaluate(model, loader, dataset):
         classes = torch.argmax(model_outs, dim=-1)
         num_correct += torch.sum(classes == output_batch).item()
         num_total += input_batch.shape[0]
+    model.train()
     print('Evaluation accuracy (%s): %.2f%%' % (dataset, 100 * num_correct / num_total))
 
 
