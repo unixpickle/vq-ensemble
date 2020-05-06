@@ -1,4 +1,5 @@
 import copy
+import random
 
 from vq_ensemble.meta_models import Encoder, Refiner
 from vq_ensemble.models import MNISTModel
@@ -108,10 +109,30 @@ def create_meta_batch(meta_model, model, inner_batches):
     return meta_loss, np.mean(init_losses)
 
 
-def load_batches(dataset):
+def load_batches(dataset, limit=None):
+    if limit is None:
+        while True:
+            for ins, outs in dataset:
+                yield ins.to(DEVICE), outs.to(DEVICE)
+
+    # Use a small subset of the data.
+    ins = []
+    outs = []
+    for x, y in dataset:
+        ins.append(x)
+        outs.append(y)
+        if sum(x.shape[0] for x in ins) >= limit:
+            break
+    batch = ins[0].shape[0]
+    all_ins = torch.cat(ins, dim=0)
+    all_outs = torch.cat(outs, dim=0)
     while True:
-        for ins, outs in dataset:
-            yield ins.to(DEVICE), outs.to(DEVICE)
+        indices = list(range(all_ins.shape[0]))
+        random.shuffle(indices)
+        for i in range(0, len(indices), batch):
+            sub_idxs = indices[i:i+batch]
+            yield (all_ins[sub_idxs].contiguous().to(DEVICE),
+                   all_outs[sub_idxs].contiguous().to(DEVICE))
 
 
 def create_datasets():
