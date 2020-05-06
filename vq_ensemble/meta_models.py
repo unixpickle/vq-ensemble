@@ -25,7 +25,7 @@ class Encoder(nn.Module):
         results = []
         for i in range(self.refiner.num_stages):
             outs = self._run_refiner(i, current_outputs)
-            losses = torch.mean(torch.pow(outs - current_outputs[:, None], 2), dim=-1)
+            losses = torch.mean(torch.pow(outs - targets[:, None], 2), dim=-1)
             indices = torch.argmin(losses, dim=1)
             current_outputs = outs[range(batch), indices]
             results.append(current_outputs)
