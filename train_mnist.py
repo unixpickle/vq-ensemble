@@ -15,6 +15,7 @@ META_BATCH_SIZE = 4
 NUM_STAGES = 20
 INNER_LR = 1e-3
 META_LR = 1e-4
+EVAL_INTERVAL = 100
 
 
 def main():
@@ -27,16 +28,40 @@ def main():
     model.to(DEVICE)
     meta_model.to(DEVICE)
 
+    evaluate(meta_model, model, test_loader)
+    return
+
     opt = optim.Adam(meta_model.parameters(), lr=META_LR)
+    step = 0
     while True:
         train_loss, train_inner_loss = create_meta_batch(meta_model, model, train_batches)
         test_loss, test_inner_loss = create_meta_batch(meta_model, model, test_batches)
-        print('train=%f test=%f train_inner=%f test_inner=%f' %
-              (train_loss.item(), test_loss.item(), train_inner_loss, test_inner_loss))
+        print('step: %d: train=%f test=%f train_inner=%f test_inner=%f' %
+              (step, train_loss.item(), test_loss.item(), train_inner_loss, test_inner_loss))
 
         meta_model.zero_grad()
         train_loss.backward()
         opt.step()
+
+        step += 1
+        if not step % EVAL_INTERVAL:
+            evaluate(meta_model, model, test_loader)
+
+
+def evaluate(meta_model, model, loader):
+    print('Evaluating model on test set...')
+    weights = meta_model.decode(meta_model.random_latents(1))[0, -1]
+    model.set_parameters(weights)
+    num_correct = 0
+    num_total = 0
+    for input_batch, output_batch in loader:
+        input_batch = input_batch.to(DEVICE)
+        output_batch = output_batch.to(DEVICE)
+        outputs = model(input_batch)
+        classes = torch.argmax(outputs, dim=-1)
+        num_correct += torch.sum(classes == output_batch).item()
+        num_total += input_batch.shape[0]
+    print('Evaluation accuracy: %.2f%%' % (100 * num_correct / num_total))
 
 
 def create_meta_batch(meta_model, model, inner_batches):
