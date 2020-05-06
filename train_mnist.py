@@ -28,6 +28,8 @@ def main():
     model.to(DEVICE)
     meta_model.to(DEVICE)
 
+    evaluate_diversity(meta_model)
+
     opt = optim.Adam(meta_model.parameters(), lr=META_LR)
     step = 0
     while True:
@@ -44,6 +46,7 @@ def main():
         if not step % EVAL_INTERVAL:
             evaluate(meta_model, model, train_loader, 'train')
             evaluate(meta_model, model, test_loader, 'test')
+            evaluate_diversity(meta_model)
 
 
 def evaluate(meta_model, model, loader, dataset):
@@ -59,6 +62,14 @@ def evaluate(meta_model, model, loader, dataset):
         num_correct += torch.sum(classes == output_batch).item()
         num_total += input_batch.shape[0]
     print('Evaluation accuracy (%s): %.2f%%' % (dataset, 100 * num_correct / num_total))
+
+
+def evaluate_diversity(meta_model):
+    samples = meta_model.decode(meta_model.random_latents(4))[:, -1]
+    mean = torch.mean(samples, dim=0)
+    sq_mean = torch.mean(samples * samples, dim=0)
+    sq_diff = sq_mean - mean*mean
+    print('Output variance: %f' % torch.mean(sq_diff).item())
 
 
 def create_meta_batch(meta_model, model, inner_batches):
