@@ -58,18 +58,22 @@ def evaluate(meta_model, model, loader, dataset):
         weights = meta_model.decode(meta_model.random_latents(1))[0, -1]
         m.set_parameters(weights)
     num_correct = 0
+    num_correct_single = 0
     num_total = 0
     for input_batch, output_batch in loader:
         input_batch = input_batch.to(DEVICE)
         output_batch = output_batch.to(DEVICE)
         with torch.no_grad():
             outputs = models[0](input_batch)
+            classes = torch.argmax(outputs, dim=-1)
+            num_correct_single += torch.sum(classes == output_batch).item()
             for m in models[1:]:
                 outputs = outputs + m(input_batch)
         classes = torch.argmax(outputs, dim=-1)
         num_correct += torch.sum(classes == output_batch).item()
         num_total += input_batch.shape[0]
-    print('Evaluation accuracy (%s): %.2f%%' % (dataset, 100 * num_correct / num_total))
+    print('Evaluation accuracy (%s): %.2f%% (single %.2f%%)' %
+          (dataset, 100 * num_correct / num_total, 100 * num_correct_single / num_total))
 
 
 def evaluate_diversity(meta_model):
