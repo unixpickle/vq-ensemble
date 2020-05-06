@@ -1,3 +1,5 @@
+import copy
+
 from vq_ensemble.meta_models import Encoder, Refiner
 from vq_ensemble.models import MNISTModel
 
@@ -16,6 +18,7 @@ NUM_STAGES = 20
 INNER_LR = 1e-3
 META_LR = 1e-4
 EVAL_INTERVAL = 100
+EVAL_ENSEMBLE = 4
 
 
 def main():
@@ -50,14 +53,19 @@ def main():
 
 
 def evaluate(meta_model, model, loader, dataset):
-    weights = meta_model.decode(meta_model.random_latents(1))[0, -1]
-    model.set_parameters(weights)
+    models = [copy.deepcopy(model) for _ in range(EVAL_ENSEMBLE)]
+    for m in models:
+        weights = meta_model.decode(meta_model.random_latents(1))[0, -1]
+        m.set_parameters(weights)
     num_correct = 0
     num_total = 0
     for input_batch, output_batch in loader:
         input_batch = input_batch.to(DEVICE)
         output_batch = output_batch.to(DEVICE)
-        outputs = model(input_batch)
+        with torch.no_grad():
+            outputs = models[0](input_batch)
+            for m in models[1:]:
+                outputs = outputs + m(input_batch)
         classes = torch.argmax(outputs, dim=-1)
         num_correct += torch.sum(classes == output_batch).item()
         num_total += input_batch.shape[0]
