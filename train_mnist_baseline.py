@@ -6,7 +6,7 @@ import torch.optim as optim
 
 from train_mnist import DEVICE, load_batches, create_datasets
 
-EVAL_INTERVAL = 200
+EVAL_INTERVAL = 2000
 REDUCE_LR_STEPS = 500
 
 
