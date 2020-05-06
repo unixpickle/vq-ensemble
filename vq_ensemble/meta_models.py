@@ -31,23 +31,39 @@ class Encoder(nn.Module):
             results.append(current_outputs)
         return torch.stack(results, dim=1)
 
-    def sample(self, batch):
+    def random_latents(self, batch):
         """
-        Sample a batch of random parameters.
+        Sample a batch of random latents.
 
         Args:
             batch: the batch size.
 
         Returns:
-            An [N x param_size] batch of parameters.
+            An [N x T] latent tensor.
         """
+        return torch.randint(self.refiner.num_options, (batch, self.refiner.num_stages))
+
+    def decode(self, latents):
+        """
+        Decode a batch of random latents.
+
+        Args:
+            latents: an [N x T] tensor.
+
+        Returns:
+            A batch of reconstruction sequences, of shape
+              [N x T x param_size].
+        """
+        batch = latents.shape[0]
         device = next(self.parameters()).device
         current_outputs = torch.zeros(batch, self.refiner.param_size, device=device)
+        results = []
         for i in range(self.refiner.num_stages):
             outs = self._run_refiner(i, current_outputs)
-            indices = torch.randint(self.refiner.num_options, (batch,))
+            indices = latents[:, i]
             current_outputs = outs[range(batch), indices]
-        return current_outputs
+            results.append(current_outputs)
+        return torch.stack(results, dim=1)
 
     def _run_refiner(self, stage, inputs):
         inputs = inputs.requires_grad_(True)
