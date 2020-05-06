@@ -18,7 +18,7 @@ The entire refinement network architecture is a hyperparameter. For now, I use a
 
 # Experiments
 
-For the inner-loop model, I chose a small CNN with two strided convolutions followed by two fully-connected layers. The model uses ReLU activations. I did not employ dropout regularization for this model, although perhaps it would help the baseline and make vq-ensemble look worse in comparison.
+For the inner-loop model, I chose a small CNN with two strided convolutions followed by two fully-connected layers. The model uses ReLU activations. I did not employ dropout regularization for vq-ensemble, although I did use it for a baseline.
 
 ## Baseline
 
@@ -42,6 +42,16 @@ RESULTS HERE
 ## vq-ensemble (take 1)
 
 In this experiment, I trained a vq-ensemble model with 40 stages and 4 options (a total of 4^40 = 1.2 * 10^24 models). I trained the model with fixed hyperparameters for a few hours. I then evaluated an ensemble of 16 randomly sampled models, where models' outputs were added after the softmax.
+
+```
+RESULTS HERE
+```
+
+## vq-ensemble (ablation)
+
+In this experiment, I replace the refinement network with a set of learnable biases. Each (stage, option) pair has a different, learned output. This removes the intelligence from the ensemble generation process, and drastically limits the distribution of model ensembles which can be learned.
+
+This experiment can be run by setting `NO_NN = True` in the [train_mnist.py](train_mnist.py) script.
 
 ```
 RESULTS HERE

@@ -10,6 +10,7 @@ EVAL_INTERVAL = 2000
 REDUCE_LR_STEPS = 500
 TOTAL_STEPS = 42000
 
+# Enable this flag to use dropout regularization.
 DROPOUT = False
 
 

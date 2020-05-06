@@ -21,6 +21,10 @@ META_LR = 1e-4
 EVAL_INTERVAL = 100
 EVAL_ENSEMBLE = 16
 
+# Enable this flag to perform an ablation where the
+# refinement network is just learned biases.
+NO_NN = False
+
 
 def main():
     train_loader, test_loader = create_datasets()
@@ -28,7 +32,7 @@ def main():
     test_batches = load_batches(test_loader)
 
     model = MNISTModel()
-    meta_model = Encoder(Refiner(model.param_size(), NUM_STAGES))
+    meta_model = Encoder(Refiner(model.param_size(), NUM_STAGES, no_nn=NO_NN))
     model.to(DEVICE)
     meta_model.to(DEVICE)
 
