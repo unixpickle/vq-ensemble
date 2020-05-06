@@ -28,9 +28,6 @@ def main():
     model.to(DEVICE)
     meta_model.to(DEVICE)
 
-    evaluate(meta_model, model, test_loader)
-    return
-
     opt = optim.Adam(meta_model.parameters(), lr=META_LR)
     step = 0
     while True:
