@@ -20,20 +20,25 @@ The entire refinement network architecture is a hyperparameter. For now, I use a
 
 For the inner-loop model, I chose a small CNN with two strided convolutions followed by two fully-connected layers. The model uses ReLU activations. I did not employ dropout regularization for vq-ensemble, although I did use it for a baseline.
 
+All of these experiments were run on the MNIST dataset. Why MNIST? Because it's small and easy to iterate on. When ideas work, I scale them to harder datasets, but MNIST is usually a sane starting point.
+
 ## Baseline
 
-As a baseline, I directly trained the CNN with Adam (using an initial LR of 1e-3 and decaying it to 1e-4). This gives an idea of how much the model is capable of overfitting, and how well it does without any ensembling. This experiment can be run with [train_mnist_baseline.py](train_mnist_baseline.py).
+As a baseline, I directly trained the CNN with Adam (using an initial LR of 1e-3 and decaying it to 1e-4). This gives an idea of how much the model is capable of overfitting, and how well it does without any ensembling.
+
+This experiment can be run with [train_mnist_baseline.py](train_mnist_baseline.py).
 
 ```
 ...
-step: 41999: train=0.000696 test=0.023440
 Evaluation accuracy (train): 100.00%
 Evaluation accuracy (test): 98.61%
 ```
 
-## Adding dropout
+## Baseline with Dropout
 
-In this experiment, I added dropout to the baseline (setting `DROPOUT = True` at the top of `train_mnist_baseline.py`). Since dropout creates an implicit ensemble, this is a good baseline for vq-ensemble.
+In this experiment, I added dropout to the baseline. Since dropout creates an implicit ensemble, this is a good baseline for vq-ensemble.
+
+To run this experiment, set `DROPOUT = True` in [train_mnist_baseline.py](train_mnist_baseline.py).
 
 ```
 RESULTS HERE
@@ -43,15 +48,17 @@ RESULTS HERE
 
 In this experiment, I trained a vq-ensemble model with 40 stages and 4 options (a total of 4^40 = 1.2 * 10^24 models). I trained the model with fixed hyperparameters for a few hours. I then evaluated an ensemble of 16 randomly sampled models, where models' outputs were added after the softmax.
 
+This experiment can be run with [train_mnist.py](train_mnist.py).
+
 ```
 RESULTS HERE
 ```
 
 ## vq-ensemble (ablation)
 
-In this experiment, I replace the refinement network with a set of learnable biases. Each (stage, option) pair has a different, learned output. This removes the intelligence from the ensemble generation process, and drastically limits the distribution of model ensembles which can be learned.
+In this experiment, I replaced the refinement network with a set of learnable biases. Thus, each `(stage, option)` pair has a different, learned output. This removes the intelligence from the ensemble generation process, and drastically limits the distribution of model ensembles which can be learned.
 
-This experiment can be run by setting `NO_NN = True` in the [train_mnist.py](train_mnist.py) script.
+This experiment can be run by setting `NO_NN = True` in [train_mnist.py](train_mnist.py).
 
 ```
 RESULTS HERE
