@@ -77,10 +77,12 @@ Output variance: 0.445067
 
 ## vq-ensemble (extra large)
 
-In this experiment, I tried tacking on an extra two layers to the refinement network, and I also upped the number of sampled models in the evaluation ensemble. Basically, this was the last push to get better results with the technique.
+In this experiment, I tried tacking on an extra two layers to the refinement network, and I also upped the number of sampled models in the evaluation ensemble. I also trained for about 10x as long as the first vq-ensemble experiment. Basically, this was the last push to get better results with the technique.
 
 This experiment can be run by setting `EXTRA_LARGE = True` and `EVAL_ENSEMBLE = 48` in [train_mnist.py](train_mnist.py).
 
 ```
-RESULTS HERE
+Evaluation accuracy (train): 100.00% (single 99.99%)
+Evaluation accuracy (test): 98.69% (single 98.67%)
+Output variance: 8.274698
 ```
