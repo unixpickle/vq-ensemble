@@ -35,7 +35,7 @@ This experiment can be run with [train_mnist_baseline.py](train_mnist_baseline.p
 ```
 ...
 Evaluation accuracy (train): 100.00%
-Evaluation accuracy (test): 98.61%
+Evaluation accuracy (test): 98.76%
 ```
 
 ## Baseline with Dropout
