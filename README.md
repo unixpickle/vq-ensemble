@@ -79,7 +79,7 @@ Output variance: 0.445067
 
 In this experiment, I tried tacking on an extra two layers to the refinement network, and I also upped the number of sampled models in the evaluation ensemble. Basically, this was the last push to get better results with the technique.
 
-This experiment can be run by setting `LARGE = True` and `EVAL_ENSEMBLE = 48` in [train_mnist.py](train_mnist.py).
+This experiment can be run by setting `EXTRA_LARGE = True` and `EVAL_ENSEMBLE = 48` in [train_mnist.py](train_mnist.py).
 
 ```
 RESULTS HERE
