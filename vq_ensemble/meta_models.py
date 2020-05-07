@@ -71,7 +71,8 @@ class Encoder(nn.Module):
 
 
 class Refiner(nn.Module):
-    def __init__(self, param_size, num_stages, num_options=4, hidden_size=512, no_nn=False):
+    def __init__(self, param_size, num_stages, num_options=4, hidden_size=512, no_nn=False,
+                 large=False):
         super().__init__()
         self.param_size = param_size
         self.num_stages = num_stages
@@ -87,12 +88,24 @@ class Refiner(nn.Module):
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
         )
-        self.mid_layer = nn.Sequential(
-            nn.Linear(hidden_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, hidden_size),
-            nn.ReLU(),
-        )
+        if large:
+            self.mid_layer = nn.Sequential(
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+            )
+        else:
+            self.mid_layer = nn.Sequential(
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+            )
         self.out_layer = nn.Sequential(
             nn.Linear(hidden_size, param_size * num_options),
         )

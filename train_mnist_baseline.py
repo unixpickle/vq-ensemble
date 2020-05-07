@@ -7,8 +7,8 @@ import torch.optim as optim
 from train_mnist import DEVICE, load_batches, create_datasets
 
 EVAL_INTERVAL = 2000
-REDUCE_LR_STEPS = 500
-TOTAL_STEPS = 42000
+REDUCE_LR_STEPS = 10000
+TOTAL_STEPS = 30000
 
 # Enable this flag to use dropout regularization.
 DROPOUT = False

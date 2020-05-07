@@ -18,12 +18,16 @@ META_BATCH_SIZE = 4
 NUM_STAGES = 40
 INNER_LR = 1e-2
 META_LR = 1e-4
-EVAL_INTERVAL = 100
+EVAL_INTERVAL = 500
 EVAL_ENSEMBLE = 16
 
 # Enable this flag to perform an ablation where the
 # refinement network is just learned biases.
 NO_NN = False
+
+# Enable this flag to use an extra large refinement
+# network (somewhat the opposite of NO_NN).
+EXTRA_LARGE = False
 
 
 def main():
@@ -32,7 +36,7 @@ def main():
     test_batches = load_batches(test_loader)
 
     model = MNISTModel()
-    meta_model = Encoder(Refiner(model.param_size(), NUM_STAGES, no_nn=NO_NN))
+    meta_model = Encoder(Refiner(model.param_size(), NUM_STAGES, no_nn=NO_NN, large=EXTRA_LARGE))
     model.to(DEVICE)
     meta_model.to(DEVICE)
 
